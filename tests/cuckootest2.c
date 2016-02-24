@@ -1,5 +1,5 @@
 #include "cuckoo_filter.h"
-#define FILTER_COUNT 1000
+#define FILTER_COUNT 10000
 
 int
 main (int argc, char ** argv) {

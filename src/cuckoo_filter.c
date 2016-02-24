@@ -213,14 +213,16 @@ cuckoo_filter_lookup (
   fingerprint &= filter->mask;
   for (size_t ii = 0; ii < filter->nests_per_bucket; ++ii) {
     cuckoo_nest_t *n1 =
-      &filter->bucket[((h1 - 1) * filter->nests_per_bucket) + ii];
+      &filter->bucket[(h1 * filter->nests_per_bucket) + ii];
+      //&filter->bucket[((h1 - 1) * filter->nests_per_bucket) + ii];
     if (fingerprint == n1->fingerprint) {
       result->was_found = true;
       break;
     }
 
     cuckoo_nest_t *n2 =
-      &filter->bucket[((h2 - 1) * filter->nests_per_bucket) + ii];
+      &filter->bucket[(h2 * filter->nests_per_bucket) + ii];
+      //&filter->bucket[((h2 - 1) * filter->nests_per_bucket) + ii];
     if (fingerprint == n2->fingerprint) {
       result->was_found = true;
       break;
