@@ -150,15 +150,14 @@ cuckoo_filter_new (
     bucket_count <<= 1;
   }
 
+  /* FIXME: Should check for integer overflows here */
   size_t allocation_in_bytes = (sizeof(cuckoo_filter_t)
     + (bucket_count * CUCKOO_NESTS_PER_BUCKET * sizeof(cuckoo_nest_t)));
 
-  if (0 != posix_memalign((void **) &new_filter, sizeof(uint64_t),
-    allocation_in_bytes)) {
+  new_filter = calloc(allocation_in_bytes, 1);
+  if (!new_filter) {
     return CUCKOO_FILTER_ALLOCATION_FAILED;
   }
-
-  memset(new_filter, 0, allocation_in_bytes);
 
   new_filter->last_victim = NULL;
   memset(&new_filter->victim, 0, sizeof(new_filter)->victim);
