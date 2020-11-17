@@ -61,10 +61,9 @@ add_fingerprint_to_bucket (
   uint32_t              fp,
   uint32_t              h
 ) {
-  fp &= filter->mask;
   for (size_t ii = 0; ii < filter->nests_per_bucket; ++ii) {
     cuckoo_nest_t *nest =
-      &filter->bucket[((h - 1) * filter->nests_per_bucket) + ii];
+      &filter->bucket[(h * filter->nests_per_bucket) + ii];
     if (0 == nest->fingerprint) {
       nest->fingerprint = fp;
       return CUCKOO_FILTER_OK;
@@ -83,10 +82,9 @@ remove_fingerprint_from_bucket (
   uint32_t              fp,
   uint32_t              h
 ) {
-  fp &= filter->mask;
   for (size_t ii = 0; ii < filter->nests_per_bucket; ++ii) {
     cuckoo_nest_t *nest =
-      &filter->bucket[((h - 1) * filter->nests_per_bucket) + ii];
+      &filter->bucket[(h * filter->nests_per_bucket) + ii];
     if (fp == nest->fingerprint) {
       nest->fingerprint = 0;
       return CUCKOO_FILTER_OK;
@@ -119,7 +117,7 @@ cuckoo_filter_move (
     return CUCKOO_FILTER_OK;
   }
 
-printf("depth = %u\n", depth);
+//printf("depth = %u\n", depth);
   if (filter->max_kick_attempts == depth) {
     return CUCKOO_FILTER_FULL;
   }
@@ -127,8 +125,8 @@ printf("depth = %u\n", depth);
   size_t row = (0 == (rand() % 2) ? h1 : h2);
   size_t col = (rand() % filter->nests_per_bucket);
   size_t elem =
-    filter->bucket[((row - 1) * filter->nests_per_bucket) + col].fingerprint;
-  filter->bucket[((row - 1) * filter->nests_per_bucket) + col].fingerprint =
+    filter->bucket[(row * filter->nests_per_bucket) + col].fingerprint;
+  filter->bucket[(row * filter->nests_per_bucket) + col].fingerprint =
     fingerprint;
   
   return cuckoo_filter_move(filter, elem, row, (depth + 1));
@@ -152,15 +150,14 @@ cuckoo_filter_new (
     bucket_count <<= 1;
   }
 
+  /* FIXME: Should check for integer overflows here */
   size_t allocation_in_bytes = (sizeof(cuckoo_filter_t)
     + (bucket_count * CUCKOO_NESTS_PER_BUCKET * sizeof(cuckoo_nest_t)));
 
-  if (0 != posix_memalign((void **) &new_filter, sizeof(uint64_t),
-    allocation_in_bytes)) {
+  new_filter = calloc(allocation_in_bytes, 1);
+  if (!new_filter) {
     return CUCKOO_FILTER_ALLOCATION_FAILED;
   }
-
-  memset(new_filter, 0, allocation_in_bytes);
 
   new_filter->last_victim = NULL;
   memset(&new_filter->victim, 0, sizeof(new_filter)->victim);
@@ -202,6 +199,7 @@ cuckoo_filter_lookup (
     1000, filter->seed);
   uint32_t h1 = hash(key, key_length_in_bytes, filter->bucket_count, 0,
     filter->seed);
+  fingerprint &= filter->mask; fingerprint += !fingerprint;
   uint32_t h2 = ((h1 ^ hash(&fingerprint, sizeof(fingerprint),
     filter->bucket_count, 900, filter->seed)) % filter->bucket_count);
 
@@ -210,11 +208,9 @@ cuckoo_filter_lookup (
   result->item.h1 = 0;
   result->item.h2 = 0;
 
-  fingerprint &= filter->mask;
   for (size_t ii = 0; ii < filter->nests_per_bucket; ++ii) {
     cuckoo_nest_t *n1 =
       &filter->bucket[(h1 * filter->nests_per_bucket) + ii];
-      //&filter->bucket[((h1 - 1) * filter->nests_per_bucket) + ii];
     if (fingerprint == n1->fingerprint) {
       result->was_found = true;
       break;
@@ -222,7 +218,6 @@ cuckoo_filter_lookup (
 
     cuckoo_nest_t *n2 =
       &filter->bucket[(h2 * filter->nests_per_bucket) + ii];
-      //&filter->bucket[((h2 - 1) * filter->nests_per_bucket) + ii];
     if (fingerprint == n2->fingerprint) {
       result->was_found = true;
       break;
