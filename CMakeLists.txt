@@ -73,7 +73,7 @@ set(CPACK_PACKAGE_VERSION_MAJOR "${${PROJECT_NAME}_VERSION_MAJOR}")
 set(CPACK_PACKAGE_VERSION_MINOR "${${PROJECT_NAME}_VERSION_MINOR}")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/cmake/README.txt")
 set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Welcome.txt")
-set(CPACK_PACKAGE_CONTACT "https://github.com/attractivechaos/${PROJECT_NAME}")
+set(CPACK_PACKAGE_CONTACT "https://github.com/jonahharris/lib${PROJECT_NAME}")
 
 include(CPack)
 include(CMakePackageConfigHelpers)
