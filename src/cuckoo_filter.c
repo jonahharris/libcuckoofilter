@@ -61,7 +61,8 @@ add_fingerprint_to_bucket (
   uint32_t              fp,
   uint32_t              h
 ) {
-  for (size_t ii = 0; ii < filter->nests_per_bucket; ++ii) {
+  size_t ii;
+  for (ii = 0; ii < filter->nests_per_bucket; ++ii) {
     cuckoo_nest_t *nest =
       &filter->bucket[(h * filter->nests_per_bucket) + ii];
     if (0 == nest->fingerprint) {
@@ -82,7 +83,8 @@ remove_fingerprint_from_bucket (
   uint32_t              fp,
   uint32_t              h
 ) {
-  for (size_t ii = 0; ii < filter->nests_per_bucket; ++ii) {
+  size_t ii;
+  for (ii = 0; ii < filter->nests_per_bucket; ++ii) {
     cuckoo_nest_t *nest =
       &filter->bucket[(h * filter->nests_per_bucket) + ii];
     if (fp == nest->fingerprint) {
@@ -207,20 +209,22 @@ cuckoo_filter_lookup (
   result->item.fingerprint = 0;
   result->item.h1 = 0;
   result->item.h2 = 0;
+  {
+    size_t ii;
+    for (ii = 0; ii < filter->nests_per_bucket; ++ii) {
+      cuckoo_nest_t *n1 =
+        &filter->bucket[(h1 * filter->nests_per_bucket) + ii];
+      if (fingerprint == n1->fingerprint) {
+        result->was_found = true;
+        break;
+      }
 
-  for (size_t ii = 0; ii < filter->nests_per_bucket; ++ii) {
-    cuckoo_nest_t *n1 =
-      &filter->bucket[(h1 * filter->nests_per_bucket) + ii];
-    if (fingerprint == n1->fingerprint) {
-      result->was_found = true;
-      break;
-    }
-
-    cuckoo_nest_t *n2 =
-      &filter->bucket[(h2 * filter->nests_per_bucket) + ii];
-    if (fingerprint == n2->fingerprint) {
-      result->was_found = true;
-      break;
+      cuckoo_nest_t *n2 =
+        &filter->bucket[(h2 * filter->nests_per_bucket) + ii];
+      if (fingerprint == n2->fingerprint) {
+        result->was_found = true;
+        break;
+      }
     }
   }
 

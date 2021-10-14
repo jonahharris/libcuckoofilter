@@ -9,6 +9,8 @@
 #include <string.h>
 #include <time.h>
 
+#include "cuckoofilter_export.h"
+
 typedef enum {
   CUCKOO_FILTER_OK = 0,
   CUCKOO_FILTER_NOT_FOUND,
@@ -18,6 +20,7 @@ typedef enum {
 
 typedef struct cuckoo_filter_t cuckoo_filter_t;
  
+CUCKOOFILTER_EXPORT
 CUCKOO_FILTER_RETURN
 cuckoo_filter_new (
   cuckoo_filter_t     **filter,
@@ -26,11 +29,13 @@ cuckoo_filter_new (
   uint32_t              seed
 );
 
+CUCKOOFILTER_EXPORT
 CUCKOO_FILTER_RETURN
 cuckoo_filter_free (
   cuckoo_filter_t     **filter
 );
 
+CUCKOOFILTER_EXPORT
 CUCKOO_FILTER_RETURN
 cuckoo_filter_add (
   cuckoo_filter_t      *filter,
@@ -38,6 +43,7 @@ cuckoo_filter_add (
   size_t                key_length_in_bytes
 );
 
+CUCKOOFILTER_EXPORT
 CUCKOO_FILTER_RETURN
 cuckoo_filter_remove (
   cuckoo_filter_t      *filter,
@@ -45,6 +51,7 @@ cuckoo_filter_remove (
   size_t                key_length_in_bytes
 );
 
+CUCKOOFILTER_EXPORT
 CUCKOO_FILTER_RETURN
 cuckoo_filter_contains (
   cuckoo_filter_t      *filter,
