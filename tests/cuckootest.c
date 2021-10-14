@@ -53,7 +53,7 @@ main (int argc, char ** argv) {
     printf("%s/%d: %d\n", __func__, __LINE__, rc);
   }
 
-  return 0;
+  return EXIT_SUCCESS;
 
 } /* main() */
 
