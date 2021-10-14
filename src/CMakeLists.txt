@@ -10,7 +10,7 @@ set(Source_Files
 )
 source_group("Source Files" FILES "${Source_Files}")
 
-add_library("${LIBRARY_NAME}" "${Header_Files}" "${Source_Files}")
+add_library("${LIBRARY_NAME}" "${LIBRARY_TYPE_FLAG}" "${Header_Files}" "${Source_Files}")
 get_filename_component(parent_dir "${CMAKE_CURRENT_SOURCE_DIR}" DIRECTORY)
 target_include_directories(
         "${LIBRARY_NAME}"
